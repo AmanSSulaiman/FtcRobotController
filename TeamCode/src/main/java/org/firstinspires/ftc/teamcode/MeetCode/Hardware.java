@@ -38,7 +38,7 @@ public class Hardware {
 
     static final double PULLEY_DIAMETER = 1.503937;
 
-    static final double COUNTS_PER_INCH_CASCADE = (COUNTS_PER_CASCADE_REV * DRIVE_GEAR_REDUCTION)/
+    static double COUNTS_PER_INCH_CASCADE = (COUNTS_PER_CASCADE_REV * DRIVE_GEAR_REDUCTION)/
             (PULLEY_DIAMETER * 3.1415);
     public ElapsedTime timer = new ElapsedTime();
 
@@ -105,6 +105,12 @@ public class Hardware {
         backRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         frontLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         frontRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+    }
+    public void turnOffEncodersCascade(){
+        cascadeMotorLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        cascadeMotorRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER
+        );
 
     }
     public void encoderDrive(double inches){

@@ -47,6 +47,7 @@ public class teleOpRed extends LinearOpMode {
         double turn = 0;        // Desired turning power/speed (-1 to +1)
         robot.init(hardwareMap);
         initAprilTag();
+        //robot.arm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.arm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         robot.arm.setTargetPosition(0);
         robot.arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -106,9 +107,9 @@ public class teleOpRed extends LinearOpMode {
                 // Apply desired axes motions to the drivetrain.
             } else {
                 // drive using manual POV Joystick mode.  Slow things down to make the robot more controlable.
-                drive = gamepad1.left_stick_y / 1.5;  // Reduce drive rate to 50%.
-                strafe = gamepad1.left_stick_x / 1.5;  // Reduce strafe rate to 50%.
-                turn = -gamepad1.right_stick_x / 2.0;  // Reduce turn rate to 33%.
+                drive = gamepad1.left_stick_y / 1;  // Reduce drive rate to 50%.
+                strafe = gamepad1.left_stick_x / 1;  // Reduce strafe rate to 50%.
+                turn = -gamepad1.right_stick_x / 1.5;  // Reduce turn rate to 33%.
                 telemetry.addData("Manual", "Drive %5.2f, Strafe %5.2f, Turn %5.2f ", drive, strafe, turn);
             }
 

@@ -47,10 +47,6 @@ public class teleOpBlue extends LinearOpMode {
         double turn = 0;        // Desired turning power/speed (-1 to +1)
         robot.init(hardwareMap);
         initAprilTag();
-        robot.arm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        robot.arm.setTargetPosition(0);
-        robot.arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.arm.setPower(.3);
         robot.wrist.setPosition(1);
         robot.turnOnEncoders();
         robot.turnOnEncodersCascade();
@@ -106,9 +102,9 @@ public class teleOpBlue extends LinearOpMode {
                 // Apply desired axes motions to the drivetrain.
             } else {
                 // drive using manual POV Joystick mode.  Slow things down to make the robot more controlable.
-                drive = gamepad1.left_stick_y / 1.5;  // Reduce drive rate to 50%.
-                strafe = gamepad1.left_stick_x / 1.5;  // Reduce strafe rate to 50%.
-                turn = -gamepad1.right_stick_x / 2.0;  // Reduce turn rate to 33%.
+                drive = gamepad1.left_stick_y / 1;  // Reduce drive rate to 50%.
+                strafe = gamepad1.left_stick_x / 1;  // Reduce strafe rate to 50%.
+                turn = -gamepad1.right_stick_x / 1.5;  // Reduce turn rate to 33%.
                 telemetry.addData("Manual", "Drive %5.2f, Strafe %5.2f, Turn %5.2f ", drive, strafe, turn);
             }
 
@@ -172,6 +168,8 @@ public class teleOpBlue extends LinearOpMode {
 
             }
             if (gamepad2.b && robot.cascadeMotorLeft.getCurrentPosition() > 940) {
+                telemetry.addData("Position", robot.arm.getCurrentPosition());
+                telemetry.update();
                 robot.arm.setTargetPosition(0);
                 robot.arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 robot.arm.setPower(.3);
@@ -184,7 +182,7 @@ public class teleOpBlue extends LinearOpMode {
                 robot.wrist.setPosition(.65);
             }
             if (gamepad2.dpad_down) {
-                robot.wrist.setPosition(.1);
+                robot.wrist.setPosition(.3);
             }
             if (gamepad2.right_stick_y >= .3) {
                 robot.cascadeMotorRight.setPower(-.9 * gamepad2.right_stick_y);
@@ -200,6 +198,48 @@ public class teleOpBlue extends LinearOpMode {
             if (gamepad1.dpad_left) {
                 robot.dropper.setPosition(.8);
             }
+            if (gamepad2.dpad_left && robot.cascadeMotorLeft.getCurrentPosition() < 1300 && robot.arm.getCurrentPosition() >= -10 && robot.arm.getCurrentPosition() <= 10) {
+
+                robot.turnOnEncoders();
+
+                robot.cascadeMotorLeft.setTargetPosition(1300);
+                robot.cascadeMotorRight.setTargetPosition(1300);
+                robot.cascadeMotorRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                robot.cascadeMotorLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                robot.cascadeMotorRight.setPower(.3);
+                robot.cascadeMotorLeft.setPower(.3);
+
+                sleep(3000);
+
+                robot.arm.setTargetPosition(438);
+                robot.arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                robot.arm.setPower(.3);
+
+                robot.turnOffEncodersCascade();
+
+            }
+
+            if (gamepad2.dpad_right && robot.cascadeMotorLeft.getCurrentPosition() < 2000 && robot.arm.getCurrentPosition() >= -10 && robot.arm.getCurrentPosition() <= 10) {
+
+                robot.turnOnEncoders();
+
+                robot.cascadeMotorLeft.setTargetPosition(2000);
+                robot.cascadeMotorRight.setTargetPosition(2000);
+                robot.cascadeMotorRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                robot.cascadeMotorLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                robot.cascadeMotorRight.setPower(.3);
+                robot.cascadeMotorLeft.setPower(.3);
+
+                sleep(3000);
+
+                robot.arm.setTargetPosition(438);
+                robot.arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                robot.arm.setPower(.3);
+
+                robot.turnOffEncodersCascade();
+
+            }
+
             /* if ( gamepad2.left_trigger < .3){
                 robot.cascadeMotorLeft.setPower(0);
                 robot.cascadeMotorRight.setPower(0);

@@ -63,8 +63,7 @@ public class CustomAutoCloseBlue extends LinearOpMode {
     private static final String TFOD_MODEL_ASSET = "BlueProp.tflite";
 
     String position = "";
-
-    final double DESIRED_DISTANCE = 8.25; //  this is how close the camera should get to the target (inches)
+    final double DESIRED_DISTANCE = 9; //  this is how close the camera should get to the target (inches)
 
     //  Set the GAIN constants to control the relationship between the measured position error, and how much power is
     //  applied to the drive motors to correct the error.
@@ -168,7 +167,9 @@ public class CustomAutoCloseBlue extends LinearOpMode {
             while (robot.timer.seconds() < 3.5){
                 aprilTagDetection();
             }
-            visionPortal.close();
+            telemetry.addData("Distance", desiredTag.ftcPose.range);
+            telemetry.update();
+            robot.encoderDrive(desiredTag.ftcPose.range - DESIRED_DISTANCE);
             robot.timer.reset();
             while (robot.timer.seconds() < 1) {
                 robot.cascadeDrive(1350);
@@ -225,7 +226,9 @@ public class CustomAutoCloseBlue extends LinearOpMode {
             while (robot.timer.seconds() < 3.5){
                 aprilTagDetection();
             }
-            visionPortal.close();
+            telemetry.addData("Distance", desiredTag.ftcPose.range);
+            telemetry.update();
+            robot.encoderDrive(desiredTag.ftcPose.range - DESIRED_DISTANCE);
             robot.timer.reset();
             while (robot.timer.seconds() < 1) {
                 robot.cascadeDrive(1350);
@@ -252,7 +255,6 @@ public class CustomAutoCloseBlue extends LinearOpMode {
             }
             sleep(500);
             robot.cascadeDrive(0);
-            robot.encoderDrive(8);
             if (park.equals("Left")) {
                 robot.encoderStrafeLeft(36);
                 robot.encoderDrive(18);
@@ -284,7 +286,9 @@ public class CustomAutoCloseBlue extends LinearOpMode {
             while (robot.timer.seconds() < 3.5){
                 aprilTagDetection();
             }
-            visionPortal.close();
+            telemetry.addData("Distance", desiredTag.ftcPose.range);
+            telemetry.update();
+            robot.encoderDrive(desiredTag.ftcPose.range - DESIRED_DISTANCE);
             robot.timer.reset();
             while (robot.timer.seconds() < 1) {
                 robot.cascadeDrive(1350);
@@ -309,6 +313,7 @@ public class CustomAutoCloseBlue extends LinearOpMode {
                 robot.arm.setPower(.4);
                 robot.cascadeDrive(1350);
             }
+            robot.cascadeDrive(0);
             sleep(500);
             if (park.equals("Left")) {
                 robot.encoderStrafeLeft(24);

@@ -64,7 +64,7 @@ public class CustomAutoFarBlue extends LinearOpMode {
 
     String position = "";
 
-    final double DESIRED_DISTANCE = 7.5; //  this is how close the camera should get to the target (inches)
+    final double DESIRED_DISTANCE = 8.5; //  this is how close the camera should get to the target (inches)
 
     //  Set the GAIN constants to control the relationship between the measured position error, and how much power is
     //  applied to the drive motors to correct the error.
@@ -88,6 +88,7 @@ public class CustomAutoFarBlue extends LinearOpMode {
     double  turn            = 0;        // Desired turning power/speed (-1 to +1)
 
     String park = "";
+    double cascadePosition;
 
     boolean indicator = false;
     private static final String[] LABELS = {
@@ -119,7 +120,7 @@ public class CustomAutoFarBlue extends LinearOpMode {
         robot.arm.setTargetPosition(0);
         robot.arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         robot.arm.setPower(.3);
-        robot.wrist.setPosition(.65);
+        robot.wrist.setPosition(.55);
         robot.claw.setPosition(0);
 
 
@@ -143,7 +144,7 @@ public class CustomAutoFarBlue extends LinearOpMode {
         }
         waitForStart();
 
-
+        sleep(3000);
         robot.timer.reset();
         while (robot.timer.seconds() < .75) {
             telemetryTfod();
@@ -155,7 +156,7 @@ public class CustomAutoFarBlue extends LinearOpMode {
             sleep(100);
             robot.encoderStrafeLeft(3);
             robot.dropper.setPosition(1);
-            sleep(250);
+            /*sleep(250);
             robot.encoderDrive(-4.5);
             sleep(100);
             robot.encoderStrafeLeft(60);
@@ -168,16 +169,19 @@ public class CustomAutoFarBlue extends LinearOpMode {
             while (robot.timer.seconds() < 3.5){
                 aprilTagDetection();
             }
+            telemetry.addData("Distance", desiredTag.ftcPose.range);
+            telemetry.update();
+            robot.encoderDrive(desiredTag.ftcPose.range - DESIRED_DISTANCE);
             robot.timer.reset();
             while (robot.timer.seconds() < 1) {
-                robot.cascadeDrive(1302);
+                robot.cascadeDrive(1390);
             }
             robot.arm.setTargetPosition(438);
             robot.arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             robot.timer.reset();
             while (robot.arm.getCurrentPosition() - robot.arm.getTargetPosition() != 0 && robot.timer.seconds() < 1) {
                 robot.arm.setPower(.4);
-                robot.cascadeDrive(1302);
+                robot.cascadeDrive(1350);
             }
             robot.claw.setPosition(.4);
             sleep(500);
@@ -188,7 +192,7 @@ public class CustomAutoFarBlue extends LinearOpMode {
             robot.timer.reset();
             while (robot.arm.getCurrentPosition() - robot.arm.getTargetPosition() != 0 && robot.timer.seconds() < 1) {
                 robot.arm.setPower(.4);
-                robot.cascadeDrive(1302);
+                robot.cascadeDrive(1350);
             }
             sleep(500);
             robot.cascadeDrive(0);
@@ -200,7 +204,7 @@ public class CustomAutoFarBlue extends LinearOpMode {
             else if (park.equals("Right")){
                 robot.encoderStrafeRight(30);
                 robot.encoderDrive(18);
-            }
+            }*/
 
         }
         else if(position.equals("Right")){
@@ -209,11 +213,11 @@ public class CustomAutoFarBlue extends LinearOpMode {
             sleep(100);
             robot.encoderStrafeRight(8);
             robot.dropper.setPosition(1);
-            sleep(250);
+            /*sleep(250);
             robot.encoderDrive(-2.5);
             sleep(100);
             robot.encoderStrafeLeft(65);
-            robot.encoderTurnLeft(23);
+            robot.encoderTurnLeft(21);
             //robot.squareUp();
             sleep(50);
             robot.turnOffEncoders();
@@ -222,16 +226,19 @@ public class CustomAutoFarBlue extends LinearOpMode {
             while (robot.timer.seconds() < 3.5){
                 aprilTagDetection();
             }
+            telemetry.addData("Distance", desiredTag.ftcPose.range);
+            telemetry.update();
+            robot.encoderDrive(desiredTag.ftcPose.range - DESIRED_DISTANCE);
             robot.timer.reset();
             while (robot.timer.seconds() < 1) {
-                robot.cascadeDrive(1302);
+                robot.cascadeDrive(1390);
             }
             robot.arm.setTargetPosition(438);
             robot.arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             robot.timer.reset();
             while (robot.arm.getCurrentPosition() - robot.arm.getTargetPosition() != 0 && robot.timer.seconds() < 1) {
                 robot.arm.setPower(.4);
-                robot.cascadeDrive(1302);
+                robot.cascadeDrive(1350);
             }
             robot.claw.setPosition(.4);
             sleep(500);
@@ -242,7 +249,7 @@ public class CustomAutoFarBlue extends LinearOpMode {
             robot.timer.reset();
             while (robot.arm.getCurrentPosition() - robot.arm.getTargetPosition() != 0 && robot.timer.seconds() < 1) {
                 robot.arm.setPower(.4);
-                robot.cascadeDrive(1302);
+                robot.cascadeDrive(1350);
             }
             sleep(500);
             robot.cascadeDrive(0);
@@ -253,7 +260,7 @@ public class CustomAutoFarBlue extends LinearOpMode {
             else if (park.equals("Right")){
                 robot.encoderStrafeRight(24);
                 robot.encoderDrive(18);
-            }
+            }*/
 
             //23, 9, 1, -.5, 65
 
@@ -262,12 +269,13 @@ public class CustomAutoFarBlue extends LinearOpMode {
             DESIRED_TAG_ID = 1;
             robot.encoderDrive(26);
             sleep(100);
-            robot.encoderStrafeLeft(17);
+            robot.encoderStrafeLeft(18.5);
             robot.dropper.setPosition(1);
-            sleep(250);
+            /*sleep(250);
+            robot.encoderDrive(-1.5);
             sleep(100);
             robot.encoderStrafeLeft(47);
-            robot.encoderTurnLeft(21);
+            robot.encoderTurnLeft(23);
             //robot.squareUp();
             sleep(50);
             robot.turnOffEncoders();
@@ -276,16 +284,20 @@ public class CustomAutoFarBlue extends LinearOpMode {
             while (robot.timer.seconds() < 3.5){
                 aprilTagDetection();
             }
+            telemetry.addData("Distance", desiredTag.ftcPose.range);
+            telemetry.update();
+            robot.encoderDrive(desiredTag.ftcPose.range - DESIRED_DISTANCE);
             robot.timer.reset();
             while (robot.timer.seconds() < 1) {
-                robot.cascadeDrive(1302);
+                robot.cascadeDrive(1390);
             }
+
             robot.arm.setTargetPosition(438);
             robot.arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             robot.timer.reset();
             while (robot.arm.getCurrentPosition() - robot.arm.getTargetPosition() != 0 && robot.timer.seconds() < 1) {
                 robot.arm.setPower(.4);
-                robot.cascadeDrive(1302);
+                robot.cascadeDrive(1350);
             }
             robot.claw.setPosition(.4);
             sleep(500);
@@ -296,7 +308,7 @@ public class CustomAutoFarBlue extends LinearOpMode {
             robot.timer.reset();
             while (robot.arm.getCurrentPosition() - robot.arm.getTargetPosition() != 0 && robot.timer.seconds() < 1) {
                 robot.arm.setPower(.4);
-                robot.cascadeDrive(1302);
+                robot.cascadeDrive(1350);
             }
             sleep(500);
             robot.cascadeDrive(0);
@@ -307,7 +319,7 @@ public class CustomAutoFarBlue extends LinearOpMode {
             else if (park.equals("Right")){
                 robot.encoderStrafeRight(36);
                 robot.encoderDrive(18);
-            }
+            }*/
 
             //21.5, 15, 47
         }
