@@ -164,6 +164,7 @@ public class CustomAutoCloseRed extends LinearOpMode {
             robot.dropper.setPosition(1);
             sleep(250);
             robot.encoderDrive(-5.5);
+            robot.arm.setTargetPosition(-50);
             robot.encoderTurnRight(23);
             //robot.squareUp();
             sleep(50);

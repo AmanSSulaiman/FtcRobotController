@@ -53,7 +53,7 @@ public class teleopRedEncoderMode extends LinearOpMode {
         robot.init(hardwareMap);
         initAprilTag();
         robot.arm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        robot.arm.setTargetPosition(-10);
+        robot.arm.setTargetPosition(-50);
         robot.arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         robot.arm.setPower(.9);
         robot.claw.setPosition(0.3);
@@ -66,8 +66,8 @@ public class teleopRedEncoderMode extends LinearOpMode {
         robot.cascadeMotorLeft.setTargetPosition(0);
         robot.cascadeMotorRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         robot.cascadeMotorLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.cascadeMotorLeft.setPower(0.5);
-        robot.cascadeMotorRight.setPower(0.5);
+        robot.cascadeMotorLeft.setPower(1);
+        robot.cascadeMotorRight.setPower(1);
         robot.launch.setPosition(0.65);
         robot.backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         robot.frontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -186,6 +186,9 @@ public class teleopRedEncoderMode extends LinearOpMode {
 //                    robot.cascadeMotorRight.setPower(0);
 //                    robot.turnOffEncodersCascade();
 
+            }
+            if (gamepad2.dpad_up) {
+                robot.resetEncodersCascade();
             }
             if (gamepad2.x && robot.cascadeMotorLeft.getCurrentPosition() > 940) {
                 robot.wrist.setPosition(0.675);
