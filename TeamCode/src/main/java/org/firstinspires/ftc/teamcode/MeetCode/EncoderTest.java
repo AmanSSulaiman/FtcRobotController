@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.MeetCode;
 import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_TO_POSITION;
 import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_USING_ENCODER;
+import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_WITHOUT_ENCODER;
 import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
 
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
@@ -40,16 +41,17 @@ public class EncoderTest extends LinearOpMode {
     public void runOpMode() {
 
         robot.init(hardwareMap);
-        robot.arm.setMode(RUN_USING_ENCODER);
-        robot.arm.setTargetPosition(-75);
-        robot.arm.setMode(RUN_TO_POSITION);
-        robot.arm.setPower(.9);
-        robot.wrist.setPosition(.4);
+        robot.cascadeMotorRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.cascadeMotorLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+//        robot.arm.setMode(RUN_USING_ENCODER);
+//        robot.arm.setTargetPosition(-75);
+//        robot.arm.setMode(RUN_TO_POSITION);
+//        robot.arm.setPower(.9);
+//        robot.wrist.setPosition(.4);
 //        robot.wrist.setPosition(1);
-//        telemetry.addData("CascadeLeft: ", robot.cascadeMotorLeft.getCurrentPosition());
-//        telemetry.addData("CascadeRight: ", robot.cascadeMotorRight.getCurrentPosition());
-//        telemetry.update();
-//        robot.resetEncodersCascade();
+
+
 
 //        telemetry.addData("arm: ", robot.arm.getCurrentPosition()); //490
 //        telemetry.addData("CascadeLeft: ", robot.cascadeMotorLeft.getCurrentPosition()); //800
@@ -64,12 +66,14 @@ public class EncoderTest extends LinearOpMode {
         int i = 0;
         while (opModeIsActive()) {
 
-
+            telemetry.addData("CascadeLeft: ", robot.cascadeMotorLeft.getCurrentPosition());
+            telemetry.addData("CascadeRight: ", robot.cascadeMotorRight.getCurrentPosition());
+            telemetry.addData("arm: ", robot.arm.getCurrentPosition()); //490
+            telemetry.update();
 
         }
 //        robot.resetEncodersCascade();
 //        sleep(3000);
-//        telemetry.addData("arm: ", robot.arm.getCurrentPosition()); //490
 //        telemetry.addData("CascadeLeft: ", robot.cascadeMotorLeft.getCurrentPosition()); //800
 //        telemetry.addData("CascadeRight: ", robot.cascadeMotorRight.getCurrentPosition()); //800
 //        telemetry.update();

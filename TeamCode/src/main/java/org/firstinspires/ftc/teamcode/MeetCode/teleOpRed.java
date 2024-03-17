@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 
-@Disabled
+@TeleOp (name = "TeleOpRed")
 public class teleOpRed extends LinearOpMode {
     double cascadeMotorPower;
     final double DESIRED_DISTANCE = 9; //  this is how close the camera should get to the target (inches)
@@ -56,7 +56,6 @@ public class teleOpRed extends LinearOpMode {
         robot.arm.setPower(.3);
         robot.wrist.setPosition(1);
         robot.resetEncodersCascade();
-        robot.turnOnEncoders();
         robot.turnOnEncodersCascade();
         robot.backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         robot.frontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -143,20 +142,20 @@ public class teleOpRed extends LinearOpMode {
             else if (gamepad2.left_bumper) {
                 robot.claw.setPosition(0.6);
             }
-            else if (gamepad2.a) {
-                synchronized (robot) {
-                    robot.cascadeLock(850);
-                    while (robot.cascadeMotorLeft.getCurrentPosition() < 830)
-                        sleep(100);
-                    robot.arm.setTargetPosition(585);
-                    robot.arm.setMode(RUN_TO_POSITION);
-                    robot.arm.setPower(0.3);
-                    sleep(1000);
-                    robot.cascadeMotorLeft.setPower(0);
-                    robot.cascadeMotorRight.setPower(0);
-                    robot.turnOffEncodersCascade();
-                    }
-            }
+//            else if (gamepad2.a) {
+//                synchronized (robot) {
+//                    robot.cascadeLock(850);
+//                    while (robot.cascadeMotorLeft.getCurrentPosition() < 830)
+//                        sleep(100);
+//                    robot.arm.setTargetPosition(585);
+//                    robot.arm.setMode(RUN_TO_POSITION);
+//                    robot.arm.setPower(0.3);
+//                    sleep(1000);
+//                    robot.cascadeMotorLeft.setPower(0);
+//                    robot.cascadeMotorRight.setPower(0);
+//                    robot.turnOffEncodersCascade();
+//                    }
+//            }
              if (gamepad2.x && robot.cascadeMotorLeft.getCurrentPosition() > 940) {
 
                 robot.arm.setTargetPosition(540);

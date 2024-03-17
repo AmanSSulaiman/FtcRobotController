@@ -84,8 +84,8 @@
     
             //braking
     
-            cascadeMotorRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-            cascadeMotorLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+//            cascadeMotorRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+//            cascadeMotorLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
             arm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
             backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
             frontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -228,14 +228,14 @@
 
             turnOnEncodersCascade();
 
-
+            cascadeMotorRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            cascadeMotorLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
             cascadeMotorRight.setTargetPosition((int)(position));
             cascadeMotorLeft.setTargetPosition((int)(position));
 
 
-            cascadeMotorRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            cascadeMotorLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
 
 
                 //            telemetry.addData("CascadeLeft: ", cascadeMotorLeft.getCurrentPosition());

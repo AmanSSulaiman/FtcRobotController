@@ -59,15 +59,15 @@ public class teleopRedEncoderMode extends LinearOpMode {
         robot.claw.setPosition(0.3);
         sleep(500);
         robot.wrist.setPosition(0.675);
-        robot.resetEncodersCascade();
-        robot.turnOnEncoders();
         robot.turnOnEncodersCascade();
+        robot.resetEncodersCascade();
+//        robot.turnOnEncoders();
         robot.cascadeMotorRight.setTargetPosition(0);
         robot.cascadeMotorLeft.setTargetPosition(0);
         robot.cascadeMotorRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         robot.cascadeMotorLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.cascadeMotorLeft.setPower(1);
-        robot.cascadeMotorRight.setPower(1);
+        robot.cascadeMotorLeft.setPower(0.5);
+        robot.cascadeMotorRight.setPower(0.5);
         robot.launch.setPosition(0.65);
         robot.backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         robot.frontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -188,14 +188,15 @@ public class teleopRedEncoderMode extends LinearOpMode {
 
             }
             if (gamepad2.x && robot.cascadeMotorLeft.getCurrentPosition() > 940) {
-
+                robot.wrist.setPosition(0.675);
                 robot.arm.setTargetPosition(540);
                 robot.arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 robot.arm.setPower(.9);
 
 
             }
-            else if (gamepad2.b && robot.cascadeMotorLeft.getCurrentPosition() > 940) {
+            else if ((gamepad2.b && robot.cascadeMotorLeft.getCurrentPosition() > 940) || (gamepad2.b && robot.arm.getCurrentPosition() < -50)) {
+                robot.wrist.setPosition(0.675);
                 robot.arm.setTargetPosition(-10);
                 robot.arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 robot.arm.setPower(.9);
@@ -245,6 +246,12 @@ public class teleopRedEncoderMode extends LinearOpMode {
                 robot.wrist.setPosition(0.675);
                 robot.cascadeMotorLeft.setTargetPosition(0);
                 robot.cascadeMotorRight.setTargetPosition(0);
+            }
+            else if (gamepad2.right_stick_button) {
+                robot.arm.setTargetPosition(-60);
+                robot.wrist.setPosition(.35);
+                robot.claw.setPosition(0.75);
+
             }
 //            else if (gamepad1.dpad_right) {
 //                robot.dropper.setPosition(.3);

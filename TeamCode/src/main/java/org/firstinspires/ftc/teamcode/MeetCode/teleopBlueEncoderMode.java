@@ -1,14 +1,10 @@
 package org.firstinspires.ftc.teamcode.MeetCode;
-
 //Aman Sulaiman, 23-24 CenterStage
-
 import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_TO_POSITION;
-
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.Range;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-
 import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.ExposureControl;
@@ -16,10 +12,8 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.GainCon
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
-
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-
 //speed up everything
 //faster when driving regularly, slower when picking up and dropping pixel
 //make the cascade go up when driving and get rid of the bug with the encoders and the claw/wrist
@@ -37,7 +31,6 @@ public class teleopBlueEncoderMode extends LinearOpMode {
     final double MAX_AUTO_SPEED = 0.55;   //  Clip the approach speed to this max value (adjust for your robot)
     final double MAX_AUTO_STRAFE = 0.55;   //  Clip the approach speed to this max value (adjust for your robot)
     final double MAX_AUTO_TURN = 0.55;
-
     public Hardware robot = new Hardware();
     private static final boolean USE_WEBCAM = true;  // Set true to use a webcam, or false for a phone camera
     private int DESIRED_TAG_ID;     // Choose the tag you want to approach or set to -1 for ANY tag.
@@ -73,13 +66,11 @@ public class teleopBlueEncoderMode extends LinearOpMode {
         robot.frontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         robot.backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         robot.frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
         telemetry.addData("Launch Position: ", robot.launch.getPosition());
         telemetry.update();
-
         if (USE_WEBCAM)
             setManualExposure(6, 250);
-
-
 
         waitForStart();
         while (opModeIsActive()) {
@@ -102,12 +93,16 @@ public class teleopBlueEncoderMode extends LinearOpMode {
                 }
             }
             cascadeMotorPower = Range.clip(cascadeMotorPower, -.1, .8);
+//            robot.frontRight.setPower(.8 * ((gamepad1.left_stick_y + gamepad1.right_stick_x) + gamepad1.left_stick_x));
+//            robot.frontLeft.setPower(.8 * ((gamepad1.left_stick_y - gamepad1.right_stick_x) - gamepad1.left_stick_x));
+//            robot.backRight.setPower(.8 * ((gamepad1.left_stick_y + gamepad1.right_stick_x) - gamepad1.left_stick_x));
+//            robot.backLeft.setPower(.8 * ((gamepad1.left_stick_y - gamepad1.right_stick_x) + gamepad1.left_stick_x));
+
             telemetry.addData("Cascade power: ", robot.cascadeMotorLeft.getPower());
             telemetry.addData("arm: ", robot.arm.getCurrentPosition());
             telemetry.addData("Wrist: ", robot.wrist.getPosition());
             telemetry.addData("CascadeLeft: ", robot.cascadeMotorLeft.getCurrentPosition()); //800
             telemetry.addData("CascadeRight: ", robot.cascadeMotorRight.getCurrentPosition()); //800
-
             telemetry.update();
             if (gamepad1.right_stick_button && targetFound) {
                 // Determine heading, range and Yaw (tag image rotation) error so we can use them to control the robot automatically.
@@ -138,7 +133,6 @@ public class teleopBlueEncoderMode extends LinearOpMode {
                     strafe = gamepad1.left_stick_x / 4;
                     turn = -gamepad1.right_stick_x / 3;
                 }
-
                 else {
                     drive = gamepad1.left_stick_y / 0.75;  // Reduce drive rate to 50%.
                     strafe = gamepad1.left_stick_x / 0.75;  // Reduce strafe rate to 50%.
@@ -146,7 +140,6 @@ public class teleopBlueEncoderMode extends LinearOpMode {
                 }
 //                telemetry.addData("Manual", "Drive %5.2f, Strafe %5.2f, Turn %5.2f ", drive, strafe, turn);
             }
-
             telemetry.update();
             // Apply desired axes motions to the drivetrain.
             moveRobot(drive, strafe, turn);
@@ -186,15 +179,11 @@ public class teleopBlueEncoderMode extends LinearOpMode {
 //                    robot.cascadeMotorLeft.setPower(0);
 //                    robot.cascadeMotorRight.setPower(0);
 //                    robot.turnOffEncodersCascade();
-
             }
             if (gamepad2.x && robot.cascadeMotorLeft.getCurrentPosition() > 940) {
-
                 robot.arm.setTargetPosition(540);
                 robot.arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 robot.arm.setPower(.5);
-
-
             }
             else if (gamepad2.b && robot.cascadeMotorLeft.getCurrentPosition() > 940) {
                 robot.arm.setTargetPosition(0);
@@ -211,7 +200,6 @@ public class teleopBlueEncoderMode extends LinearOpMode {
 //                sleep(125);
 //                robot.claw.setPosition(0);
             }
-
             if (gamepad1.dpad_up) {
                 robot.cascadeMotorLeft.setTargetPosition(0);
                 robot.cascadeMotorRight.setTargetPosition(0);
@@ -232,6 +220,7 @@ public class teleopBlueEncoderMode extends LinearOpMode {
             }
 
             else if (gamepad1.dpad_right) {
+                robot.launch.setPosition(1);
                 robot.launch.setPosition(0);
             }
             else if (gamepad1.dpad_left) {
@@ -255,7 +244,6 @@ public class teleopBlueEncoderMode extends LinearOpMode {
 //            }
         }
     }
-
     public void moveRobot ( double x, double y, double yaw){
         // Calculate wheel powers.
         double leftFrontPower = x - y - yaw;
@@ -312,7 +300,6 @@ public class teleopBlueEncoderMode extends LinearOpMode {
      Manually set the camera gain and exposure.
      This can only be called AFTER calling initAprilTag(), and only works for Webcams;
     */
-
     private void setManualExposure ( int exposureMS, int gain){
         // Wait for the camera to be open, then use the controls
         if (visionPortal == null) {

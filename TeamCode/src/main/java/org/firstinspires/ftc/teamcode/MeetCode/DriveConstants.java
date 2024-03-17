@@ -1,4 +1,5 @@
-package org.firstinspires.ftc.teamcode.drive;
+package org.firstinspires.ftc.teamcode.MeetCode;
+
 
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
@@ -56,7 +57,7 @@ public class DriveConstants {
      */
     public static double kV = 0.0173170133486264483;
     public static double kA = 0.003;
-    public static double kStatic = 0.012;
+    public static double kStatic = 0.015;
 
     /*
      * These values are used to generate the trajectories for you robot. To ensure proper operation,

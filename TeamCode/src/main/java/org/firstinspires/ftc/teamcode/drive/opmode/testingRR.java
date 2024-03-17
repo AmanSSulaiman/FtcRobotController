@@ -1,44 +1,36 @@
-/* Copyright (c) 2019 FIRST. All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without modification,
- * are permitted (subject to the limitations in the disclaimer below) provided that
- * the following conditions are met:
- *
- * Redistributions of source code must retain the above copyright notice, this list
- * of conditions and the following disclaimer.
- *
- * Redistributions in binary form must reproduce the above copyright notice, this
- * list of conditions and the following disclaimer in the documentation and/or
- * other materials provided with the distribution.
- *
- * Neither the name of FIRST nor the names of its contributors may be used to endorse or
- * promote products derived from this software without specific prior written permission.
- *
- * NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY THIS
- * LICENSE. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
- * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE
- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
- * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
+package org.firstinspires.ftc.teamcode.drive.opmode;
 
-package org.firstinspires.ftc.teamcode.MeetCode;
+import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_TO_POSITION;
+import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.RUN_USING_ENCODER;
 
+import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.acmerobotics.roadrunner.geometry.Vector2d;
+import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.Range;
-
+import com.acmerobotics.roadrunner.drive.DriveSignal;
+import com.acmerobotics.roadrunner.drive.MecanumDrive;
+import com.acmerobotics.roadrunner.followers.HolonomicPIDVAFollower;
+import com.acmerobotics.roadrunner.followers.TrajectoryFollower;
+import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.acmerobotics.roadrunner.trajectory.Trajectory;
+import com.acmerobotics.roadrunner.trajectory.TrajectoryBuilder;
+import com.acmerobotics.roadrunner.trajectory.constraints.AngularVelocityConstraint;
+import com.acmerobotics.roadrunner.trajectory.constraints.MecanumVelocityConstraint;
+import com.acmerobotics.roadrunner.trajectory.constraints.MinVelocityConstraint;
+import com.acmerobotics.roadrunner.trajectory.constraints.ProfileAccelerationConstraint;
+import com.acmerobotics.roadrunner.trajectory.constraints.TrajectoryAccelerationConstraint;
+import com.acmerobotics.roadrunner.trajectory.constraints.TrajectoryVelocityConstraint;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.ExposureControl;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.GainControl;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
+import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
+import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
+import org.firstinspires.ftc.teamcode.trajectorysequence.sequencesegment.TrajectorySegment;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
@@ -48,21 +40,17 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /*
- * This OpMode illustrates the basics of TensorFlow Object Detection,
- * including Java Builder structures for specifying Vision parameters.
- *
- * Use Android Studio to Copy this Class, and Paste it into your team's code folder with a new name.
- * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list.
+ * This is an example of a more complex path to really test the tuning.
  */
-@Autonomous(name = "Auto Red Close", group = "Concept")
-
-public class CustomAutoCloseRed extends LinearOpMode {
-
+@Autonomous(name = "testing", group = "drive")
+public class testingRR extends LinearOpMode {
     private static final boolean USE_WEBCAM = true;  // true for webcam, false for phone camera
 
     private static final String TFOD_MODEL_ASSET = "RedProp.tflite";
 
-
+    public static double VX_WEIGHT = 1;
+    public static double VY_WEIGHT = 1;
+    public static double OMEGA_WEIGHT = 1;
     String position = "";
 
     final double DESIRED_DISTANCE = 8.5; //  this is how close the camera should get to the target (inches)
@@ -78,7 +66,7 @@ public class CustomAutoCloseRed extends LinearOpMode {
     final double MAX_AUTO_STRAFE= 0.7;   //  Clip the approach speed to this max value (adjust for your robot)
     final double MAX_AUTO_TURN  = 0.7;
 
-    private  int DESIRED_TAG_ID = -1;
+    private  int DESIRED_TAG_ID = 5;
     private int ticksForCascade = 920;
     private double DESIRED_STRAFE = 0;
     private AprilTagProcessor aprilTag;
@@ -107,18 +95,11 @@ public class CustomAutoCloseRed extends LinearOpMode {
      */
     private VisionPortal visionPortal;
 
-    Hardware robot = new Hardware();
-
     @Override
-    public void runOpMode() {
-
-
-
-
-
+    public void runOpMode() throws InterruptedException {
+        SampleMecanumDrive robot = new SampleMecanumDrive(hardwareMap);
         initTfod();
-        robot.init(hardwareMap);
-//        robot.resetEncodersCascade();
+        robot.resetEncodersCascade();
 //        robot.launch.setPosition(0.65);
         robot.arm.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         robot.arm.setTargetPosition(0);
@@ -126,223 +107,156 @@ public class CustomAutoCloseRed extends LinearOpMode {
         robot.arm.setPower(.9);
         robot.wrist.setPosition(0.675);
         robot.claw.setPosition(0);
-
-
-
-
-
-        // Wait for the DS start button to be touched.
-        //tfod.setZoom(.5);
-
-        while (park.equals("")) {
-            if (gamepad1.left_bumper) {
-                park = "Left";
-            } else if (gamepad1.right_bumper) {
-                park = "Right";
-            }
-            telemetry.addData("arm: ", robot.arm.getCurrentPosition()); //490
-            telemetry.addData("CascadeLeft: ", robot.cascadeMotorLeft.getCurrentPosition()); //800
-            telemetry.addData("CascadeRight: ", robot.cascadeMotorRight.getCurrentPosition()); //800
-            telemetry.addData("Park Location", park);
-            telemetry.update();
-        }
-
         waitForStart();
-        telemetry.clear();
 
-        robot.timer.reset();
-        while (robot.timer.seconds() < .75) {
-            telemetryTfod();
-        }
-        robot.encoderStrafeLeft(4);
-        if(position.equals("Center")) {
-            DESIRED_TAG_ID = 5;
-            robot.encoderDrive(30.5);
+        if (isStopRequested()) return;
+        Pose2d startingPose = new Pose2d(14, -60, Math.toRadians(90));
+        robot.setPoseEstimate(startingPose);
+        TrajectorySequence traj = robot.trajectorySequenceBuilder(startingPose)
+                .forward(30.5)
+                .lineTo(new Vector2d(14,-35))
+                .turn(Math.toRadians(-90))
+//                .addDisplacementMarker(() ->{
+////                    robot.timer.reset();
+//////        robot.cascadeLock(ticksForCascade);
+////                    robot.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+////                    setManualExposure(6, 250);
+////                    while (robot.timer.seconds() < 1.75){
+////                        aprilTagDetection(robot);
+////                        Pose2d poseEstimate = robot.getPoseEstimate();
+////                        telemetry.addData("x", poseEstimate.getX());
+////                        telemetry.addData("y", poseEstimate.getY());
+////                        telemetry.addData("heading", poseEstimate.getHeading());
+////                        telemetry.update();
+//                    }
+
+//                })
+                .build();
+
+
+        // april tag
+
+
+
+
+
+
+//        Trajectory traj6 = robot.trajectoryBuilder(traj5.end())
+//                .lineTo(new Vector2d(40, -23.3))
+//                .build();
+//        Trajectory traj7 = robot.trajectoryBuilder(traj6.end())
+//                .splineToConstantHeading(new Vector2d(58.5, -11), Math.toRadians(0))
+//                .build();
+
+
+
+        robot.followTrajectorySequence(traj);
+//        .addDisplacementMarker(() -> {
+            robot.timer.reset();
+//        robot.cascadeLock(ticksForCascade);
+            robot.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            setManualExposure(6, 250);
+            while (robot.timer.seconds() < 2){
+                aprilTagDetection(robot);
+                Pose2d poseEstimate = robot.getPoseEstimate();
+                telemetry.addData("x", poseEstimate.getX());
+                telemetry.addData("y", poseEstimate.getY());
+                telemetry.addData("heading", poseEstimate.getHeading());
+                telemetry.update();
+            }
+
+
+//                    robot.setMode(DcMotor.RunMode.);
+//        })
+//        robot.dropper.setPosition(1);
+//        robot.followTrajectory(traj1);
+//        robot.turn(Math.toRadians(-90));
+        Pose2d poseEstimate = robot.getPoseEstimate();
+        Trajectory errorApril = robot.trajectoryBuilder(new Pose2d(poseEstimate.getX(),poseEstimate.getY(),poseEstimate.getHeading())) //26.67, -33.3
+                .forward(desiredTag.ftcPose.range - DESIRED_DISTANCE)
+                .build();
+        robot.followTrajectory(errorApril);
+        TrajectorySequence traj1 = robot.trajectorySequenceBuilder(errorApril.end())
+                .lineTo(new Vector2d(35,-35))
+//                        .addDisplacementMarker(0.5, 0, () -> {
+//                    robot.claw.setPosition(0);
+//                    robot.wrist.setPosition(1);
+//                })
+                .lineToLinearHeading(new Pose2d(23.1, -7,Math.toRadians(0)))
+                .lineToLinearHeading(new Pose2d(-53, -7,Math.toRadians(0)))
+                .addDisplacementMarker(() -> {
+                    robot.wrist.setPosition(.35);
+                    robot.claw.setPosition(0.75);
+                    robot.arm.setTargetPosition(-75);
+                })
+
+                .setConstraints(SampleMecanumDrive.getVelocityConstraint(12, Math.toRadians(48), 19.075), SampleMecanumDrive.getAccelerationConstraint(10))
+
+                .lineToLinearHeading(new Pose2d(-61, -6.95,Math.toRadians(0)))
+
+//                .addDisplacementMarker(() -> {
+//                    robot.wrist.setPosition(.4);
+//                    robot.arm.setTargetPosition(-85);
+//                    robot.claw.setPosition(0);
+//                })
+                .waitSeconds(1)
+                .resetConstraints()
+//                .lineTo(new Vector2d(-55, -7))
+                .build();
+
+        robot.followTrajectorySequence(traj1);
+        robot.claw.setPosition(0);
+        sleep(1000);
+        TrajectorySequence traj2 = robot.trajectorySequenceBuilder(traj1.end())
+                .lineTo(new Vector2d(23.1, -7))
+                .lineTo(new Vector2d(48, -29))
+//                                .splineToConstantHeading(new Vector2d(-60, -11.5), Math.toRadians(0))
+                .lineTo(new Vector2d(31.5, -7))
+                .lineTo(new Vector2d(59, -7))
+                        .build();
+        robot.followTrajectorySequence(traj2);
+
+
+
+        //        robot.arm.setTargetPosition(450);
+//        sleep(250);
+//        robot.wrist.setPosition(0.58);
+//        sleep(100);
+//        robot.claw.setPosition(.47);
+//        sleep(25);
+//        robot.claw.setPosition(0.8);
+
+        //put another thing
+//        robot.followTrajectory(back1);
+//        robot.claw.setPosition(0);
+//        robot.wrist.setPosition(1);
+
+
+//        robot.arm.setTargetPosition(0);
+//        sleep(100);
+//        while (robot.arm.getCurrentPosition() > 50)
 //            sleep(50);
-            robot.encoderStrafeRight(3);
-//            sleep(250);
-            robot.dropper.setPosition(1);
-            sleep(250);
-            robot.encoderDrive(-5.5);
-            robot.encoderTurnRight(23);
-            //robot.squareUp();
-            sleep(50);
-            robot.turnOffEncoders();
-            setManualExposure(6, 250);
-            robot.timer.reset();
-            robot.cascadeLock(ticksForCascade);
-            while (robot.timer.seconds() < 1.75){
-                aprilTagDetection();
-            }
-            telemetry.addData("Distance", desiredTag.ftcPose.range);
-            telemetry.addData("Strafe Error: ", desiredTag.ftcPose.x);
-            telemetry.update();
-            robot.encoderDrive(desiredTag.ftcPose.range - DESIRED_DISTANCE);
-            robot.encoderStrafeLeft(desiredTag.ftcPose.x + DESIRED_STRAFE);
-            robot.timer.reset();
-
-            robot.arm.setTargetPosition(450);
-            sleep(250);
-            robot.wrist.setPosition(0.58);
-            sleep(100);
-            robot.encoderDrive(2);
-            robot.claw.setPosition(.47);
-            sleep(25);
-            robot.claw.setPosition(0.8);
-            sleep(100);
-            robot.encoderDrive(-6);
-            robot.claw.setPosition(0);
-            sleep(100);
-            robot.wrist.setPosition(1);
-            robot.arm.setTargetPosition(0);
-            sleep(100);
-            while (robot.arm.getCurrentPosition() > 50)
-                sleep(50);
-            robot.cascadeLock(0);
-//            robot.encoderStrafeLeft(30);
-//            robot.encoderDrive(-60);
-            if (park.equals("Left")) {
-                robot.encoderStrafeLeft(30);
-                robot.encoderDrive(18);
-            }
-            else if (park.equals("Right")){
-                robot.encoderStrafeRight(30);
-                robot.encoderDrive(18);
-            }
-
-        }
-        else if(position.equals("Right")){
-            DESIRED_TAG_ID = 6;
-            robot.encoderDrive(26);
-//            sleep(100);
-            robot.encoderStrafeRight(13);
-//            sleep(250);
-            robot.dropper.setPosition(1);
-            sleep(250);
-            robot.encoderDrive(-7.5);
-            robot.encoderTurnRight(23);
-            //robot.squareUp();
-            sleep(50);
-            robot.turnOffEncoders();
-            setManualExposure(6, 250);
-            robot.timer.reset();
-            robot.cascadeLock(ticksForCascade);
-            while (robot.timer.seconds() < 1.75){
-                aprilTagDetection();
-            }
-            telemetry.addData("Distance", desiredTag.ftcPose.range);
-            telemetry.addData("Strafe Error: ", desiredTag.ftcPose.x);
-            telemetry.update();
-            robot.encoderDrive(desiredTag.ftcPose.range - DESIRED_DISTANCE);
-            robot.encoderStrafeRight(desiredTag.ftcPose.x + 1);
-            robot.timer.reset();
-//            robot.cascadeLock(ticksForCascade);
-//            while (robot.cascadeMotorLeft.getCurrentPosition() < 820)
-//                sleep(100);
-            robot.arm.setTargetPosition(450);
-            sleep(250);
-            robot.wrist.setPosition(0.58);
-            sleep(100);
-            robot.encoderDrive(2);
-            robot.claw.setPosition(.47);
-            sleep(25);
-            robot.claw.setPosition(0.8);
-            sleep(100);
-            robot.encoderDrive(-6);
-            robot.claw.setPosition(0);
-            sleep(100);
-            robot.wrist.setPosition(1);
-            robot.arm.setTargetPosition(0);
-            sleep(100);
-            while (robot.arm.getCurrentPosition() > 50)
-                sleep(50);
-            robot.cascadeLock(0);
-            if (park.equals("Left")) {
-                robot.encoderStrafeLeft(36);
-                robot.encoderDrive(18);
-            }
-            else if (park.equals("Right")){
-                robot.encoderStrafeRight(24);
-                robot.encoderDrive(18);
-            }
-
-            //23, 9, 1, -.5, 65
-
-        }
-        else{
-            DESIRED_TAG_ID = 4;
-            robot.encoderDrive(26.55);
-            sleep(100);
-            robot.encoderStrafeLeft(14.5);
-            sleep(250);
-            robot.dropper.setPosition(1);
-            sleep(250);
-            robot.encoderDrive(-2);
-//            sleep(250);
-            robot.encoderStrafeRight(15);
-            robot.encoderTurnRight(21);
-            //robot.squareUp();
-            sleep(50);
-            robot.turnOffEncoders();
-            setManualExposure(6, 250);
-            robot.timer.reset();
-            robot.cascadeLock(ticksForCascade);
-            while (robot.timer.seconds() < 2.0){
-                aprilTagDetection();
-            }
-            telemetry.addData("Distance", desiredTag.ftcPose.range);
-            telemetry.addData("Strafe Error: ", desiredTag.ftcPose.x);
-            telemetry.update();
-            robot.encoderDrive(desiredTag.ftcPose.range - DESIRED_DISTANCE);
-            robot.encoderStrafeLeft(desiredTag.ftcPose.x + DESIRED_STRAFE);
-            robot.timer.reset();
-            robot.arm.setTargetPosition(450);
-            sleep(250);
-            robot.wrist.setPosition(0.58);
-            sleep(100);
-            robot.encoderDrive(2);
-            robot.claw.setPosition(.47);
-            sleep(25);
-            robot.claw.setPosition(0.8);
-            sleep(100);
-            robot.encoderDrive(-6);
-            robot.claw.setPosition(0);
-            sleep(100);
-            robot.wrist.setPosition(1);
-            robot.arm.setTargetPosition(0);
-            sleep(100);
-            while (robot.arm.getCurrentPosition() > 50)
-                sleep(50);
-            robot.cascadeLock(0);
-            if (park.equals("Left")) {
-                robot.encoderStrafeLeft(21);
-                robot.encoderDrive(18);
-            }
-            else if (park.equals("Right")){
-                robot.encoderStrafeRight(36);
-                robot.encoderDrive(18);
-            }
-
-            //21.5, 15, 47
-        }
+//        robot.cascadeLock(0);
 
 
-        // Push telemetry to the Driver Station.
-
-
-        // Save CPU resources; can resume streaming when needed.
+//        robot.followTrajectory(traj2);
+//
+//        robot.followTrajectory(traj3);
+//
+//        robot.followTrajectory(traj4);
+//
+//        robot.followTrajectory(traj5);
+//
+//        robot.followTrajectory(traj6);
+//
+//        robot.followTrajectory(traj7);
 
         // Share the CPU.
         sleep(20);
 
         // Save more CPU resources when camera is no longer needed.
         visionPortal.close();
-
-    }   // end runOpMode()
-
-    /**
-     * Initialize the TensorFlow Object Detection processor.
-     */
+    }
     private void initTfod() {
 
         // Create the TensorFlow processor by using a builder.
@@ -435,7 +349,7 @@ public class CustomAutoCloseRed extends LinearOpMode {
         }   // end for() loop
 
     }
-    public void moveRobot(double x, double y, double yaw) {
+    public void moveRobot(double x, double y, double yaw, SampleMecanumDrive robot) {
         // Calculate wheel powers.
         double leftFrontPower    =  x -y -yaw;
         double rightFrontPower   =  x +y +yaw;
@@ -532,7 +446,8 @@ public class CustomAutoCloseRed extends LinearOpMode {
             sleep(20);
         }
     }
-    public void  aprilTagDetection(){
+    public void  aprilTagDetection(SampleMecanumDrive robot){
+
         targetFound = false;
         desiredTag = null;
 
@@ -570,10 +485,12 @@ public class CustomAutoCloseRed extends LinearOpMode {
             telemetry.addLine("Target not found");
         }
         telemetry.update();
-        moveRobot(drive, strafe, turn);
+        robot.update();
+        moveRobot(drive, strafe, turn, robot);
+//        robot.setWeightedDrivePower(new Pose2d(drive, strafe, turn));
         sleep(10);
 
         // Apply desired axes motions to the drivetrain
     }
 
-}   // end class
+}
